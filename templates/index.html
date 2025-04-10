@@ -1,0 +1,940 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Helmet Detection System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+        }
+        
+        body {
+            padding: 0;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar {
+            background-color: var(--secondary-color) !important;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 30px 0;
+        }
+        
+        .app-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .app-card .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0;
+        }
+        
+        .nav-tabs {
+            border-bottom: none;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            padding: 15px 25px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            background-color: transparent;
+        }
+        
+        .nav-tabs .nav-link:hover:not(.active) {
+            color: var(--secondary-color);
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .img-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .img-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        
+        .detection-box {
+            position: absolute;
+            border: 3px solid;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+        
+        .detection-label {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            border-radius: 4px;
+        }
+        
+        #webcam-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        #webcam, #webcam-output {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-weight: 600;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        
+        .detection-stats {
+            border-radius: 10px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stats-card {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stats-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .stats-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .stats-card p {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .without-helmet-card {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .with-helmet-card {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+        
+        .total-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .settings-section {
+            margin-bottom: 30px;
+        }
+        
+        .control-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+        }
+        
+        .loading-spinner {
+            display: none;
+        }
+        
+        .spinner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            border-radius: 10px;
+        }
+        
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        .model-info {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .fps-counter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 5;
+        }
+        
+        .alert {
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 15px;
+            }
+            
+            .img-container {
+                height: 300px;
+            }
+            
+            #webcam, #webcam-output {
+                height: 300px;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/"><i class="fas fa-hard-hat"></i> Advanced Helmet Detection</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="about-link" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                                <i class="fas fa-info-circle"></i> About
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="content-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="app-card card">
+                            <div class="card-header">
+                                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab">
+                                            <i class="fas fa-upload"></i> Upload Image
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="webcam-tab" data-bs-toggle="tab" data-bs-target="#webcam-tab-content" type="button" role="tab">
+                                            <i class="fas fa-video"></i> Live Detection
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-tab-content" type="button" role="tab">
+                                            <i class="fas fa-cog"></i> Settings
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <div class="tab-content" id="myTabContent">
+                                    <!-- Upload Image Tab -->
+                                    <div class="tab-pane fade show active" id="upload" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-lg-7">
+                                                <h4 class="mb-4"><i class="fas fa-upload"></i> Upload Image for Helmet Detection</h4>
+                                                <div class="upload-area" id="drop-area">
+                                                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                                    <h5>Drag & Drop Image Here</h5>
+                                                    <p class="text-muted">or click to browse files</p>
+                                                    <input type="file" id="file" name="file" accept="image/*" style="display: none;">
+                                                </div>
+                                                
+                                                <form id="upload-form" class="mb-4">
+                                                    <div class="mb-3">
+                                                        <label for="confidence-slider" class="form-label control-label">Detection Confidence: <span id="confidence-value">0.4</span></label>
+                                                        <input type="range" class="form-range" id="confidence-slider" min="0.1" max="1.0" step="0.05" value="0.4">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-search"></i> Detect Helmets
+                                                    </button>
+                                                </form>
+                                                
+                                                <div id="upload-error" class="alert alert-danger" style="display: none;">
+                                                    <i class="fas fa-exclamation-triangle"></i> <span id="error-message"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5">
+                                                <div id="upload-results" style="display: none;">
+                                                    <h4 class="mb-4"><i class="fas fa-chart-bar"></i> Detection Results</h4>
+                                                    <div class="img-container" id="result-container">
+                                                        <img id="result-image" src="" alt="Detection Result">
+                                                        <div class="spinner-overlay loading-spinner" id="upload-spinner">
+                                                            <div class="spinner-border text-primary" role="status">
+                                                                <span class="visually-hidden">Loading...</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row mt-4">
+                                                        <div class="col-4">
+                                                            <div class="stats-card without-helmet-card">
+                                                                <i class="fas fa-user-times"></i>
+                                                                <h3 id="without-helmet-count">0</h3>
+                                                                <p>Without Helmet</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="stats-card with-helmet-card">
+                                                                <i class="fas fa-user-check"></i>
+                                                                <h3 id="with-helmet-count">0</h3>
+                                                                <p>With Helmet</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="stats-card total-card">
+                                                                <i class="fas fa-users"></i>
+                                                                <h3 id="total-count">0</h3>
+                                                                <p>Total</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Webcam Tab -->
+                                    <div class="tab-pane fade" id="webcam-tab-content" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <h4 class="mb-4"><i class="fas fa-video"></i> Live Helmet Detection</h4>
+                                                <div id="webcam-container">
+                                                    <video id="webcam" autoplay playsinline style="display: none;"></video>
+                                                    <canvas id="webcam-canvas" style="display: none;"></canvas>
+                                                    <img id="webcam-output" style="display: none;" alt="Webcam Output">
+                                                    <div class="fps-counter" id="fps-counter">0 FPS</div>
+                                                    <div class="spinner-overlay loading-spinner" id="webcam-spinner">
+                                                        <div class="spinner-border text-primary" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between mt-4">
+                                                    <button id="start-webcam" class="btn btn-primary">
+                                                        <i class="fas fa-play"></i> Start Detection
+                                                    </button>
+                                                    <button id="stop-webcam" class="btn btn-danger" style="display: none;">
+                                                        <i class="fas fa-stop"></i> Stop Detection
+                                                    </button>
+                                                    <div class="webcam-controls" style="display: none;">
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input" type="checkbox" id="high-fps-toggle">
+                                                            <label class="form-check-label" for="high-fps-toggle">High FPS Mode</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div id="webcam-stats" style="display: none;">
+                                                    <h4 class="mb-4"><i class="fas fa-chart-bar"></i> Live Statistics</h4>
+                                                    <div class="stats-card without-helmet-card mb-3">
+                                                        <i class="fas fa-user-times"></i>
+                                                        <h3 id="webcam-without-helmet">0</h3>
+                                                        <p>Without Helmet</p>
+                                                    </div>
+                                                    <div class="stats-card with-helmet-card mb-3">
+                                                        <i class="fas fa-user-check"></i>
+                                                        <h3 id="webcam-with-helmet">0</h3>
+                                                        <p>With Helmet</p>
+                                                    </div>
+                                                    <div class="stats-card total-card mb-3">
+                                                        <i class="fas fa-users"></i>
+                                                        <h3 id="webcam-total">0</h3>
+                                                        <p>Total</p>
+                                                    </div>
+                                                    
+                                                    <div class="alert alert-info mt-4">
+                                                        <i class="fas fa-info-circle"></i> For best performance, ensure good lighting and clear visibility of subjects.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Settings Tab -->
+                                    <div class="tab-pane fade" id="settings-tab-content" role="tabpanel">
+                                        <h4 class="mb-4"><i class="fas fa-cog"></i> Detection Settings</h4>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="settings-section">
+                                                    <h5>Detection Parameters</h5>
+                                                    <div class="mb-3">
+                                                        <label for="global-confidence" class="form-label control-label">Default Confidence Threshold: <span id="global-confidence-value">0.4</span></label>
+                                                        <input type="range" class="form-range" id="global-confidence" min="0.1" max="1.0" step="0.05" value="0.4">
+                                                        <div class="form-text">Higher values mean more certain detections but may miss some objects.</div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="settings-section">
+                                                    <h5>Webcam Settings</h5>
+                                                    <div class="mb-3">
+                                                        <label for="webcam-fps" class="form-label control-label">Processing Rate: <span id="webcam-fps-value">250</span>ms</label>
+                                                        <input type="range" class="form-range" id="webcam-fps" min="100" max="1000" step="50" value="250">
+                                                        <div class="form-text">Lower values mean faster processing but may impact performance.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="settings-section">
+                                                    <h5>Model Information</h5>
+                                                    <div class="model-info">
+                                                        <div id="model-stats">
+                                                            <p><strong>Model Path:</strong> <span id="model-path">Loading...</span></p>
+                                                            <p><strong>Classes:</strong> <span id="model-classes">Loading...</span></p>
+                                                            <p><strong>Device:</strong> <span id="model-device">Loading...</span></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="alert alert-primary mt-4">
+                                                    <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> For real-time detection, good lighting conditions significantly improve accuracy.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="container">
+                <p class="mb-0">&copy; 2025 Advanced Helmet Detection System</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-info-circle"></i> About Helmet Detection System</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This application uses machine learning to detect whether people are wearing helmets in images and live video.</p>
+                    <p>The system uses YOLO (You Only Look Once) object detection to identify two classes:</p>
+                    <ul>
+                        <li><span class="badge bg-danger">Without Helmet</span> - People not wearing proper head protection</li>
+                        <li><span class="badge bg-success">With Helmet</span> - People wearing appropriate helmets</li>
+                    </ul>
+                    <p>This tool can be used for workplace safety monitoring, construction site management, and safety compliance.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Main elements
+            const uploadForm = document.getElementById('upload-form');
+            const fileInput = document.getElementById('file');
+            const uploadSpinner = document.getElementById('upload-spinner');
+            const uploadError = document.getElementById('upload-error');
+            const errorMessage = document.getElementById('error-message');
+            const uploadResults = document.getElementById('upload-results');
+            const resultImage = document.getElementById('result-image');
+            const resultContainer = document.getElementById('result-container');
+            const withoutHelmetCount = document.getElementById('without-helmet-count');
+            const withHelmetCount = document.getElementById('with-helmet-count');
+            const totalCount = document.getElementById('total-count');
+            
+            // Confidence slider
+            const confidenceSlider = document.getElementById('confidence-slider');
+            const confidenceValue = document.getElementById('confidence-value');
+            
+            // Global settings
+            const globalConfidence = document.getElementById('global-confidence');
+            const globalConfidenceValue = document.getElementById('global-confidence-value');
+            const webcamFpsSlider = document.getElementById('webcam-fps');
+            const webcamFpsValue = document.getElementById('webcam-fps-value');
+            
+            // Webcam elements
+            const startWebcamBtn = document.getElementById('start-webcam');
+            const stopWebcamBtn = document.getElementById('stop-webcam');
+            const webcamElement = document.getElementById('webcam');
+            const webcamCanvas = document.getElementById('webcam-canvas');
+            const webcamOutput = document.getElementById('webcam-output');
+            const webcamStats = document.getElementById('webcam-stats');
+            const webcamWithoutHelmet = document.getElementById('webcam-without-helmet');
+            const webcamWithHelmet = document.getElementById('webcam-with-helmet');
+            const webcamTotal = document.getElementById('webcam-total');
+            const webcamControls = document.querySelector('.webcam-controls');
+            const highFpsToggle = document.getElementById('high-fps-toggle');
+            const fpsCounter = document.getElementById('fps-counter');
+            const webcamSpinner = document.getElementById('webcam-spinner');
+            
+            // Drag and drop area
+            const dropArea = document.getElementById('drop-area');
+            
+            // Model info elements
+            const modelPath = document.getElementById('model-path');
+            const modelClasses = document.getElementById('model-classes');
+            const modelDevice = document.getElementById('model-device');
+            
+            // Global variables
+            let stream = null;
+            let isWebcamActive = false;
+            let webcamInterval = null;
+            let frameCount = 0;
+            let lastFrameTime = Date.now();
+            let processingInterval = parseInt(webcamFpsValue.textContent);
+            
+            // Update confidence value display
+            confidenceSlider.addEventListener('input', function() {
+                confidenceValue.textContent = this.value;
+            });
+            
+            // Update global confidence value display
+            globalConfidence.addEventListener('input', function() {
+                globalConfidenceValue.textContent = this.value;
+                // Update the upload slider to match
+                confidenceSlider.value = this.value;
+                confidenceValue.textContent = this.value;
+            });
+            
+            // Update webcam FPS value display
+            webcamFpsSlider.addEventListener('input', function() {
+                webcamFpsValue.textContent = this.value;
+                processingInterval = parseInt(this.value);
+                
+                // If webcam is active, restart the interval
+                if (isWebcamActive && webcamInterval) {
+                    clearInterval(webcamInterval);
+                    webcamInterval = setInterval(captureFrame, processingInterval);
+                }
+            });
+            
+            // Handle drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.classList.add('bg-light');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('bg-light');
+            }
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    fileInput.files = files;
+                }
+            }
+            
+            // Click to select file
+            dropArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // Handle form submission
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!fileInput.files || !fileInput.files[0]) {
+                    errorMessage.textContent = 'Please select an image file first.';
+                    uploadError.style.display = 'block';
+                    return;
+                }
+                
+                uploadSpinner.style.display = 'flex';
+                uploadResults.style.display = 'block';
+                uploadError.style.display = 'none';
+                
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('confidence', confidenceSlider.value);
+                
+                fetch('/detect', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    uploadSpinner.style.display = 'none';
+                    
+                    if (data.error) {
+                        errorMessage.textContent = data.error;
+                        uploadError.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Display the result image
+                    resultImage.src = `/uploads/${data.result_filename}?t=${new Date().getTime()}`;
+                    
+                    // Count detections by class
+                    let withoutHelmet = data.class_counts['0'] || 0;
+                    let withHelmet = data.class_counts['1'] || 0;
+                    let total = withoutHelmet + withHelmet;
+                    
+                    // Update counts
+                    withoutHelmetCount.textContent = withoutHelmet;
+                    withHelmetCount.textContent = withHelmet;
+                    totalCount.textContent = total;
+                })
+                .catch(error => {
+                    uploadSpinner.style.display = 'none';
+                    errorMessage.textContent = 'An error occurred during detection. Please try again.';
+                    uploadError.style.display = 'block';
+                    console.error('Error:', error);
+                });
+            });
+            
+            // Get model stats when settings tab is shown
+            document.getElementById('settings-tab').addEventListener('shown.bs.tab', function() {
+                fetch('/get_stats')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Error getting model stats:', data.error);
+                            return;
+                        }
+                        
+                        modelPath.textContent = data.model_path;
+                        modelClasses.textContent = data.classes.join(', ');
+                        modelDevice.textContent = data.device;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+            
+            // FPS calculation
+            function updateFPS() {
+                const now = Date.now();
+                const elapsed = now - lastFrameTime;
+                if (elapsed > 1000) { // Update every second
+                    const fps = Math.round((frameCount / elapsed) * 1000);
+                    fpsCounter.textContent = fps + ' FPS';
+                    frameCount = 0;
+                    lastFrameTime = now;
+                }
+                frameCount++;
+            }
+            
+            // Webcam handling
+            startWebcamBtn.addEventListener('click', function() {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    webcamSpinner.style.display = 'flex';
+                    
+                    navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                            facingMode: "environment" 
+                        } 
+                    })
+                    .then(function(videoStream) {
+                        stream = videoStream;
+                        webcamElement.srcObject = stream;
+                        webcamElement.style.display = 'block';
+                        webcamOutput.style.display = 'none';
+                        startWebcamBtn.style.display = 'none';
+                        stopWebcamBtn.style.display = 'inline-block';
+                        webcamStats.style.display = 'block';
+                        webcamControls.style.display = 'block';
+                        isWebcamActive = true;
+                        webcamSpinner.style.display = 'none';
+                        
+                        // Reset counters
+                        webcamWithoutHelmet.textContent = '0';
+                        webcamWithHelmet.textContent = '0';
+                        webcamTotal.textContent = '0';
+                        
+                        // Start capturing frames with the current processing interval
+                        webcamInterval = setInterval(captureFrame, processingInterval);
+                    })
+                    .catch(function(error) {
+                        webcamSpinner.style.display = 'none';
+                        console.error('Error accessing webcam:', error);
+                        alert('Error accessing webcam. Please make sure you have a webcam connected and have granted permission to use it.');
+                    });
+                } else {
+                    alert('Your browser does not support accessing the webcam');
+                }
+            });
+            
+            stopWebcamBtn.addEventListener('click', function() {
+                stopWebcam();
+            });
+            
+            function stopWebcam() {
+                if (stream) {
+                    const tracks = stream.getTracks();
+                    tracks.forEach(track => track.stop());
+                    stream = null;
+                }
+                
+                if (webcamInterval) {
+                    clearInterval(webcamInterval);
+                    webcamInterval = null;
+                }
+                
+                isWebcamActive = false;
+                webcamElement.style.display = 'none';
+                webcamOutput.style.display = 'none';
+                startWebcamBtn.style.display = 'inline-block';
+                stopWebcamBtn.style.display = 'none';
+                webcamStats.style.display = 'none';
+                webcamControls.style.display = 'none';
+                fpsCounter.textContent = '0 FPS';
+            }
+            
+            // Toggle high FPS mode
+            highFpsToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    processingInterval = 100; // 10 FPS
+                    webcamFpsSlider.value = 100;
+                    webcamFpsValue.textContent = '100';
+                } else {
+                    processingInterval = parseInt(webcamFpsSlider.value);
+                }
+                
+                // Restart the interval if webcam is active
+                if (isWebcamActive && webcamInterval) {
+                    clearInterval(webcamInterval);
+                    webcamInterval = setInterval(captureFrame, processingInterval);
+                }
+            });
+            
+            function captureFrame() {
+                if (!isWebcamActive) return;
+                
+                updateFPS();
+                
+                const context = webcamCanvas.getContext('2d');
+                webcamCanvas.width = webcamElement.videoWidth;
+                webcamCanvas.height = webcamElement.videoHeight;
+                context.drawImage(webcamElement, 0, 0, webcamCanvas.width, webcamCanvas.height);
+                
+                const imageData = webcamCanvas.toDataURL('image/jpeg', 0.8);
+                
+                // Send frame to server for detection
+                fetch('/detect_frame', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        frame: imageData,
+                        confidence: globalConfidence.value // Use the global confidence setting
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error:', data.error);
+                        return;
+                    }
+                    
+                    // Display the result image
+                    webcamElement.style.display = 'none';
+                    webcamOutput.src = data.image;
+                    webcamOutput.style.display = 'block';
+                    
+                    // Count detections by class
+                    let withoutHelmet = data.class_counts['0'] || 0;
+                    let withHelmet = data.class_counts['1'] || 0;
+                    let total = withoutHelmet + withHelmet;
+                    
+                    // Update counts
+                    webcamWithoutHelmet.textContent = withoutHelmet;
+                    webcamWithHelmet.textContent = withHelmet;
+                    webcamTotal.textContent = total;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+            
+            // Handle tab switch
+            const webcamTab = document.getElementById('webcam-tab');
+            webcamTab.addEventListener('shown.bs.tab', function(e) {
+                // No need to stop webcam when showing the tab
+            });
+            
+            const uploadTab = document.getElementById('upload-tab');
+            uploadTab.addEventListener('shown.bs.tab', function() {
+                // Optional: Stop webcam when switching to upload tab
+                // stopWebcam();
+            });
+            
+            // Stop webcam when unloading the page
+            window.addEventListener('beforeunload', function() {
+                stopWebcam();
+            });
+        });
+    </script>
+</body>
+</html>
